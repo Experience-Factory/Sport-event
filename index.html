@@ -113,7 +113,8 @@
 
   <div class="note">
     <p><b>Times are Belgian local time.</b> Exact where known (F1 races, football kick-offs, the Belgian hockey matches at Wavre, darts sessions). Where an exact time is not yet published, an approximate window is shown — "afternoon", "evening", "~3pm", "morning", "TBC" — and should be reconfirmed the week of the event.</p>
-    <p><b>Free platforms:</b> Auvio (RTBF, French) · VRT MAX (Sporza, Dutch) · VTM GO (VTM 2, Dutch — darts). A free account is enough; all three work in Eupen and Antwerp.</p>
+    <p><b>Free platforms:</b> Auvio (RTBF, FR) · VRT MAX (Sporza, NL) · VTM GO (VTM 2, NL) · RTL Play (Club RTL, FR). A free account is enough; all work in Eupen and Antwerp.</p>
+    <p><b>Champions League:</b> one free “match of the week” per matchday is free — on Club RTL / RTL Play (French) and VTM 2 / VTM GO (Dutch; the Wednesday match and games with Belgian clubs). The rest of the Champions League is pay-TV (DAZN). The Champions League dates below are provisional placeholders and will be replaced by the official fixture and date once announced.</p>
     <p style="margin-bottom:0"><b>Good to know:</b> the F1 Las Vegas GP is a night race, shown here at ~05:00 Sunday morning. The Vuelta has two rest days (usually Mondays) and the PDC World Championship pauses for Christmas (24–26 Dec) — those days may be blank. During the Hockey World Cup, matches take place almost every day (15–30 Aug); the exact group games listed are Belgium's — the knockout matches from 24 Aug depend on results.</p>
   </div>
 
@@ -124,10 +125,12 @@
 const MAP = {};
 function key(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
 function platLabel(p){
-  if(p.includes('auvio')&&p.includes('vrt'))return'Auvio / VRT MAX';
-  if(p.includes('vtm'))return'VTM GO';
-  if(p.includes('vrt'))return'VRT MAX';
-  if(p.includes('auvio'))return'Auvio';return'';
+  var out=[];
+  if(p.includes('auvio'))out.push('Auvio');
+  if(p.includes('rtl'))out.push('RTL Play');
+  if(p.includes('vrt'))out.push('VRT MAX');
+  if(p.includes('vtm'))out.push('VTM GO');
+  return out.join(' / ');
 }
 function add(dateStr,ev){(MAP[dateStr]=MAP[dateStr]||[]).push(ev);}
 function addRange(start,end,ev,skip){
@@ -179,6 +182,12 @@ add('2026-10-07',{t:'TBC',lbl:'Red Flames · Belgium – Poland (W-World Cup pla
 add('2026-10-13',{t:'TBC',lbl:'Red Flames · Poland – Belgium (play-off, 2nd leg)',sport:'Football',plat:['auvio','vrt']});
 add('2026-11-12',{t:'18:00',lbl:'Football · Turkey – Belgium (Nations League)',sport:'Football',plat:['auvio','vrt']});
 add('2026-11-15',{t:'20:45',lbl:'Football · Belgium – Italy (Nations League)',sport:'Football',plat:['auvio','vrt']});
+add('2026-09-09',{t:'~21:00',lbl:'Football · Champions League — free match of the week (fixture TBC)',sport:'Football',plat:['rtl','vtm']});
+add('2026-10-14',{t:'~21:00',lbl:'Football · Champions League — free match of the week (fixture TBC)',sport:'Football',plat:['rtl','vtm']});
+add('2026-10-21',{t:'~21:00',lbl:'Football · Champions League — free match of the week (fixture TBC)',sport:'Football',plat:['rtl','vtm']});
+add('2026-11-04',{t:'~21:00',lbl:'Football · Champions League — free match of the week (fixture TBC)',sport:'Football',plat:['rtl','vtm']});
+add('2026-11-25',{t:'~21:00',lbl:'Football · Champions League — free match of the week (fixture TBC)',sport:'Football',plat:['rtl','vtm']});
+add('2026-12-09',{t:'~21:00',lbl:'Football · Champions League — free match of the week (fixture TBC)',sport:'Football',plat:['rtl','vtm']});
 
 // --- Cycling one-day races ---
 add('2026-08-30',{t:'afternoon',lbl:'Bretagne Classic',sport:'Cycling',plat:['auvio','vrt']});
