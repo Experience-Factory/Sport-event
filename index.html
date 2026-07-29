@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sports Broadcast Calendar · Aug–Dec 2026 · Eupen &amp; Antwerp</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#f3f4f7;color:#1c2030;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.4;padding:28px 18px 60px}
+  .wrap{max-width:1120px;margin:0 auto}
+  h1{font-size:1.55rem;margin:0 0 3px}
+  .sub{color:#6a7086;margin:0 0 18px;font-size:.92rem}
+  .legend{display:flex;flex-wrap:wrap;gap:7px 14px;font-size:.76rem;color:#4a5066;
+    background:#fff;border:1px solid #e6e6ec;border-radius:12px;padding:11px 15px;margin-bottom:14px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}
+  .filters button{background:#fff;color:#5a6076;border:1px solid #dcdce4;
+    padding:6px 13px;border-radius:20px;cursor:pointer;font-size:.83rem;font-weight:600;transition:.15s}
+  .filters button:hover{border-color:#b9b9c6}
+  .filters button.active{background:#1c2030;color:#fff;border-color:#1c2030}
+  .month{margin:24px 0 10px;font-size:1.15rem;font-weight:700}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .dow{font-size:.68rem;font-weight:700;color:#9096a8;text-transform:uppercase;letter-spacing:.4px;padding:0 4px 2px}
+  .cell{background:#fff;border:1px solid #e6e6ec;border-radius:8px;min-height:96px;padding:4px 5px 6px;overflow:hidden}
+  .cell.lead{background:transparent;border:none}
+  .cell.we{background:#fbfbfd}
+  .daynum{font-size:.72rem;font-weight:700;color:#3a3f52;margin-bottom:2px}
+  .cell.has .daynum{color:#1c2030}
+  .ev{border-radius:6px;padding:3px 5px;margin-top:3px;font-size:.7rem;line-height:1.22;border-left:3px solid}
+  .ev .t{font-weight:800;margin-right:3px}
+  .ev .p{display:block;font-size:.6rem;opacity:.72;margin-top:1px;font-weight:600}
+  .s-F1{background:#fdeaea;border-color:#e63946;color:#7a1a20}
+  .s-Cycling{background:#fbf0dd;border-color:#e08a00;color:#764c00}
+  .s-Cyclocross{background:#f3e9fb;border-color:#8e44ad;color:#4a1d63}
+  .s-Football{background:#e7f0fb;border-color:#2b6cb0;color:#173a5e}
+  .s-Darts{background:#e6f6ec;border-color:#2f9e44;color:#14532d}
+  .s-Hockey{background:#fdeee2;border-color:#e8590c;color:#7a2e06}
+  .s-Athletics{background:#e2f5f7;border-color:#0c8599;color:#084a54}
+  .note{background:#fff;border:1px solid #e6e6ec;border-radius:12px;padding:15px 18px;
+    margin-top:28px;font-size:.83rem;color:#5a6076}
+  .note b{color:#1c2030}
+  @media (max-width:640px){
+    .cell{min-height:auto}.ev{font-size:.64rem}.ev .p{display:none}
+    .daynum{font-size:.66rem}
+  }
+  @media print{body{background:#fff}.filters{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sports Broadcast Calendar · August → December 2026</h1>
+  <p class="sub">Day by day, what to show on free streaming in Eupen &amp; Antwerp — a blank cell means nothing scheduled. All times are Belgian local time.</p>
+
+  <div class="legend">
+    <span><span class="dot" style="background:#e63946"></span>F1</span>
+    <span><span class="dot" style="background:#e08a00"></span>Cycling</span>
+    <span><span class="dot" style="background:#8e44ad"></span>Cyclocross</span>
+    <span><span class="dot" style="background:#2b6cb0"></span>Football</span>
+    <span><span class="dot" style="background:#e8590c"></span>Hockey</span>
+    <span><span class="dot" style="background:#0c8599"></span>Athletics</span>
+    <span><span class="dot" style="background:#2f9e44"></span>Darts</span>
+  </div>
+
+  <div class="filters" id="filters">
+    <button data-f="all" class="active">All</button>
+    <button data-f="F1">F1</button>
+    <button data-f="Cycling">Cycling</button>
+    <button data-f="Cyclocross">Cyclocross</button>
+    <button data-f="Football">Football</button>
+    <button data-f="Hockey">Hockey</button>
+    <button data-f="Athletics">Athletics</button>
+    <button data-f="Darts">Darts</button>
+  </div>
+
+  <div id="cal"></div>
+
+  <div class="note">
+    <p><b>Times are Belgian local time.</b> Exact where known (F1 races, football kick-offs, the Belgian hockey matches at Wavre, darts sessions). Where an exact time is not yet published, an approximate window is shown — "afternoon", "evening", "~3pm", "morning", "TBC" — and should be reconfirmed the week of the event.</p>
+    <p><b>Free platforms:</b> Auvio (RTBF, French) · VRT MAX (Sporza, Dutch) · VTM GO (VTM 2, Dutch — darts). A free account is enough; all three work in Eupen and Antwerp.</p>
+    <p style="margin-bottom:0"><b>Good to know:</b> the F1 Las Vegas GP is a night race, shown here at ~05:00 Sunday morning. The Vuelta has two rest days (usually Mondays) and the PDC World Championship pauses for Christmas (24–26 Dec) — those days may be blank. During the Hockey World Cup, matches take place almost every day (15–30 Aug); the exact group games listed are Belgium's — the knockout matches from 24 Aug depend on results.</p>
+  </div>
+
+  <p class="sub" style="margin-top:20px;font-size:.76rem">Verified July 2026. The F1 Belgian GP (Spa) took place in late July, before this window.</p>
+</div>
+
+<script>
+const MAP = {};
+function key(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');}
+function platLabel(p){
+  if(p.includes('auvio')&&p.includes('vrt'))return'Auvio / VRT MAX';
+  if(p.includes('vtm'))return'VTM GO';
+  if(p.includes('vrt'))return'VRT MAX';
+  if(p.includes('auvio'))return'Auvio';return'';
+}
+function add(dateStr,ev){(MAP[dateStr]=MAP[dateStr]||[]).push(ev);}
+function addRange(start,end,ev,skip){
+  skip=skip||[];
+  let cur=new Date(start+'T00:00:00'), stop=new Date(end+'T00:00:00');
+  while(cur<=stop){
+    const k=cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0')+'-'+String(cur.getDate()).padStart(2,'0');
+    if(!skip.includes(k)) add(k, Object.assign({}, ev));
+    cur.setDate(cur.getDate()+1);
+  }
+}
+
+// --- Multi-day series ---
+addRange('2026-08-19','2026-08-23',{t:'afternoon',lbl:'Renewi Tour — stage',sport:'Cycling',plat:['auvio','vrt']});
+addRange('2026-08-22','2026-09-13',{t:'aft. ~5:30pm',lbl:'Vuelta a España — stage',sport:'Cycling',plat:['auvio','vrt']});
+addRange('2026-08-24','2026-08-29',{t:'see prog.',lbl:'Hockey World Cup — knockout stage',sport:'Hockey',plat:['auvio','vrt']});
+addRange('2026-09-20','2026-09-27',{t:'evening',lbl:'Road World Championships (Montréal)',sport:'Cycling',plat:['auvio','vrt']});
+addRange('2026-10-13','2026-10-18',{t:'morning',lbl:'Tour of Guangxi — stage',sport:'Cycling',plat:['auvio','vrt']});
+addRange('2026-12-10','2026-12-31',{t:'1:30pm & 8pm',lbl:'PDC World Darts Championship',sport:'Darts',plat:['vtm']},['2026-12-24','2026-12-25','2026-12-26']);
+
+// --- Hockey World Cup — Belgium group matches (Wavre) ---
+add('2026-08-15',{t:'21:00',lbl:'Hockey · Red Lions v France',sport:'Hockey',plat:['auvio','vrt']});
+add('2026-08-16',{t:'17:30',lbl:'Hockey · Red Panthers v New Zealand',sport:'Hockey',plat:['auvio','vrt']});
+add('2026-08-17',{t:'20:30',lbl:'Hockey · Red Lions v Germany',sport:'Hockey',plat:['auvio','vrt']});
+add('2026-08-18',{t:'20:30',lbl:'Hockey · Red Panthers v Spain',sport:'Hockey',plat:['auvio','vrt']});
+add('2026-08-19',{t:'20:30',lbl:'Hockey · Red Lions v Malaysia',sport:'Hockey',plat:['auvio','vrt']});
+add('2026-08-20',{t:'20:30',lbl:'Hockey · Red Panthers v Ireland',sport:'Hockey',plat:['auvio','vrt']});
+add('2026-08-30',{t:'afternoon',lbl:'Hockey World Cup — FINAL &amp; bronze match',sport:'Hockey',plat:['auvio','vrt']});
+
+// --- F1 (Belgian time) ---
+add('2026-08-23',{t:'15:00',lbl:'F1 · Dutch GP (Zandvoort)',sport:'F1',plat:['auvio','vrt']});
+add('2026-09-06',{t:'15:00',lbl:'F1 · Italian GP (Monza)',sport:'F1',plat:['auvio','vrt']});
+add('2026-09-13',{t:'15:00',lbl:'F1 · Spanish GP (Madrid)',sport:'F1',plat:['auvio','vrt']});
+add('2026-09-26',{t:'13:00',lbl:'F1 · Azerbaijan GP (Baku) — Saturday race',sport:'F1',plat:['auvio','vrt']});
+add('2026-10-11',{t:'14:00',lbl:'F1 · Singapore GP',sport:'F1',plat:['auvio','vrt']});
+add('2026-10-25',{t:'21:00',lbl:'F1 · United States GP (Austin)',sport:'F1',plat:['auvio','vrt']});
+add('2026-11-01',{t:'21:00',lbl:'F1 · Mexico City GP',sport:'F1',plat:['auvio','vrt']});
+add('2026-11-08',{t:'18:00',lbl:'F1 · São Paulo GP (Brazil)',sport:'F1',plat:['auvio','vrt']});
+add('2026-11-22',{t:'05:00',lbl:'F1 · Las Vegas GP (night race, Sun morning)',sport:'F1',plat:['auvio','vrt']});
+add('2026-11-29',{t:'17:00',lbl:'F1 · Qatar GP',sport:'F1',plat:['auvio','vrt']});
+add('2026-12-06',{t:'14:00',lbl:'F1 · Abu Dhabi GP (SEASON FINALE)',sport:'F1',plat:['auvio','vrt']});
+
+// --- Football ---
+add('2026-09-25',{t:'20:45',lbl:'Football · Italy – Belgium (Nations League)',sport:'Football',plat:['auvio','vrt']});
+add('2026-09-28',{t:'20:45',lbl:'Football · Belgium – France (Nations League)',sport:'Football',plat:['auvio','vrt']});
+add('2026-10-02',{t:'20:45',lbl:'Football · Belgium – Turkey (Nations League)',sport:'Football',plat:['auvio','vrt']});
+add('2026-10-05',{t:'20:45',lbl:'Football · France – Belgium (Nations League)',sport:'Football',plat:['auvio','vrt']});
+add('2026-10-07',{t:'TBC',lbl:'Red Flames · Belgium – Poland (W-World Cup play-off)',sport:'Football',plat:['auvio','vrt']});
+add('2026-10-13',{t:'TBC',lbl:'Red Flames · Poland – Belgium (play-off, 2nd leg)',sport:'Football',plat:['auvio','vrt']});
+add('2026-11-12',{t:'18:00',lbl:'Football · Turkey – Belgium (Nations League)',sport:'Football',plat:['auvio','vrt']});
+add('2026-11-15',{t:'20:45',lbl:'Football · Belgium – Italy (Nations League)',sport:'Football',plat:['auvio','vrt']});
+
+// --- Cycling one-day races ---
+add('2026-08-30',{t:'afternoon',lbl:'Bretagne Classic',sport:'Cycling',plat:['auvio','vrt']});
+add('2026-09-11',{t:'evening ~8pm',lbl:'GP de Québec',sport:'Cycling',plat:['auvio','vrt']});
+add('2026-09-13',{t:'evening ~8pm',lbl:'GP de Montréal',sport:'Cycling',plat:['auvio','vrt']});
+add('2026-10-10',{t:'aft. ~5pm',lbl:'Il Lombardia (Tour of Lombardy)',sport:'Cycling',plat:['auvio','vrt']});
+add('2026-10-11',{t:'aft. ~5pm',lbl:'Paris–Tours',sport:'Cycling',plat:['auvio','vrt']});
+
+// --- Athletics ---
+add('2026-09-04',{t:'~7pm',lbl:'Memorial Van Damme (Diamond League final)',sport:'Athletics',plat:['auvio','vrt']});
+add('2026-09-05',{t:'~7pm',lbl:'Memorial Van Damme (day 2)',sport:'Athletics',plat:['auvio','vrt']});
+
+// --- Cyclocross ---
+add('2026-10-25',{t:'~3pm',lbl:'Cyclocross · Druivencross Overijse',sport:'Cyclocross',plat:['vrt']});
+add('2026-11-01',{t:'~3pm',lbl:'Cyclocross · Koppenbergcross',sport:'Cyclocross',plat:['vrt']});
+add('2026-11-05',{t:'~8pm',lbl:'Cyclocross · Noordzeecross Middelkerke (night)',sport:'Cyclocross',plat:['vrt']});
+add('2026-11-11',{t:'~3pm',lbl:'Cyclocross · Jaarmarktcross Niel',sport:'Cyclocross',plat:['vrt']});
+add('2026-11-15',{t:'~3pm',lbl:'Cyclocross · Bollekescross Hamme',sport:'Cyclocross',plat:['vrt']});
+add('2026-11-22',{t:'~3pm',lbl:'Cyclocross · be-Mine Beringen',sport:'Cyclocross',plat:['vrt']});
+add('2026-11-27',{t:'~3pm',lbl:'Cyclocross · World Cup Ostrava',sport:'Cyclocross',plat:['vrt']});
+add('2026-11-29',{t:'~3pm',lbl:'Cyclocross · World Cup Tábor',sport:'Cyclocross',plat:['vrt']});
+add('2026-12-06',{t:'~3pm',lbl:'Cyclocross · Superprestige Ruddervoorde',sport:'Cyclocross',plat:['vrt']});
+add('2026-12-13',{t:'~3pm',lbl:'Cyclocross · World Cup Glasgow',sport:'Cyclocross',plat:['vrt']});
+add('2026-12-19',{t:'~3pm',lbl:'Cyclocross · World Cup ANTWERP',sport:'Cyclocross',plat:['vrt']});
+add('2026-12-20',{t:'~3pm',lbl:'Cyclocross · World Cup Koksijde',sport:'Cyclocross',plat:['vrt']});
+add('2026-12-23',{t:'~3pm',lbl:'Cyclocross · Azencross Loenhout',sport:'Cyclocross',plat:['vrt']});
+add('2026-12-25',{t:'~3pm',lbl:'Cyclocross · Heusden-Zolder (Christmas Day)',sport:'Cyclocross',plat:['vrt']});
+add('2026-12-26',{t:'~3pm',lbl:'Cyclocross · World Cup Gavere',sport:'Cyclocross',plat:['vrt']});
+add('2026-12-27',{t:'~3pm',lbl:'Cyclocross · World Cup Namur',sport:'Cyclocross',plat:['auvio','vrt']});
+add('2026-12-29',{t:'~3pm',lbl:'Cyclocross · World Cup Besançon',sport:'Cyclocross',plat:['vrt']});
+
+// ---- Render ----
+const MONTHS=[
+  {name:'August 2026',y:2026,m:7},
+  {name:'September 2026',y:2026,m:8},
+  {name:'October 2026',y:2026,m:9},
+  {name:'November 2026',y:2026,m:10},
+  {name:'December 2026',y:2026,m:11},
+];
+const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const root=document.getElementById('cal');
+
+function render(filter){
+  root.innerHTML='';
+  MONTHS.forEach(M=>{
+    const h=document.createElement('div');h.className='month';h.textContent=M.name;root.appendChild(h);
+    const grid=document.createElement('div');grid.className='cal';
+    DOW.forEach(d=>{const c=document.createElement('div');c.className='dow';c.textContent=d;grid.appendChild(c);});
+    const first=new Date(M.y,M.m,1);
+    const lead=(first.getDay()+6)%7;
+    for(let i=0;i<lead;i++){const c=document.createElement('div');c.className='cell lead';grid.appendChild(c);}
+    const nDays=new Date(M.y,M.m+1,0).getDate();
+    for(let d=1;d<=nDays;d++){
+      const dt=new Date(M.y,M.m,d);
+      const we=(dt.getDay()===0||dt.getDay()===6);
+      const cell=document.createElement('div');
+      cell.className='cell'+(we?' we':'');
+      const evs=(MAP[key(M.y,M.m,d)]||[]).filter(e=>filter==='all'||e.sport===filter);
+      if(evs.length)cell.classList.add('has');
+      const dn=document.createElement('div');dn.className='daynum';dn.textContent=d;cell.appendChild(dn);
+      evs.forEach(e=>{
+        const b=document.createElement('div');b.className='ev s-'+e.sport;
+        b.innerHTML='<span class="t">'+e.t+'</span>'+e.lbl+'<span class="p">'+platLabel(e.plat)+'</span>';
+        cell.appendChild(b);
+      });
+      grid.appendChild(cell);
+    }
+    root.appendChild(grid);
+  });
+}
+render('all');
+document.getElementById('filters').addEventListener('click',ev=>{
+  if(ev.target.tagName!=='BUTTON')return;
+  document.querySelectorAll('#filters button').forEach(b=>b.classList.remove('active'));
+  ev.target.classList.add('active');
+  render(ev.target.dataset.f);
+});
+</script>
+</body>
+</html>
