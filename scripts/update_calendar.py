@@ -207,6 +207,32 @@ def fetch_auvio_sport_events():
 
 
 # ---------- merge ----------
+#
+# Same date + same sport does NOT mean same broadcast: a championship routinely
+# has a morning session and a separate evening session for the same sport on the
+# same day (e.g. athletics heats at 11:45, finals at 20:15) and both deserve their
+# own row. So "is this the same event" is decided by date + sport + start time
+# being close together, not by date + sport alone, and not by label (labels from
+# different sources for the same broadcast rarely match verbatim: Sporza's NL
+# "EK atletiek" vs. Auvio's FR "Athlétisme - Euro Birmingham 2026").
+
+SAME_EVENT_TOLERANCE_MIN = 60
+
+
+def start_minutes(t):
+    """Leading 'HH:MM' of a time string -> minutes since midnight, else None."""
+    m = re.match(r"(\d{1,2}):(\d{2})", t or "")
+    return int(m.group(1)) * 60 + int(m.group(2)) if m else None
+
+
+def same_broadcast(a, b):
+    if a["date"] != b["date"] or a["sport"] != b["sport"]:
+        return False
+    sa, sb = start_minutes(a["t"]), start_minutes(b["t"])
+    if sa is None or sb is None:
+        return False  # can't confirm they're the same slot -- treat as distinct, not a guess
+    return abs(sa - sb) <= SAME_EVENT_TOLERANCE_MIN
+
 
 def merge_sources(sporza_events, auvio_events):
     merged = list(sporza_events)
@@ -215,7 +241,7 @@ def merge_sources(sporza_events, auvio_events):
         for j, av in enumerate(auvio_events):
             if j in used_auvio:
                 continue
-            if sp["date"] == av["date"] and sp["sport"] == av["sport"]:
+            if same_broadcast(sp, av):
                 merged[i]["plat"] = sorted(set(merged[i]["plat"]) | set(av["plat"]))
                 used_auvio.add(j)
                 break
@@ -372,11 +398,11 @@ def main():
     today = date.today()
 
     # carry forward previous auto-added events that are still upcoming; drop past ones
-    # (they're inert anyway once MONTHS rolls past them, no need to keep bloating the file)
-    auto_events_by_key = {}
-    for e in extract_auto_events(html):
-        if e["date"] >= today.isoformat():
-            auto_events_by_key[(e["date"], e["sport"], normalize_lbl(e["lbl"]))] = e
+    # (they're inert anyway once MONTHS rolls past them, no need to keep bloating the file).
+    # Kept as a list, not keyed by label: a championship can run a morning session and
+    # an evening session for the same sport on the same day, and they must both survive
+    # as separate rows -- see same_broadcast().
+    auto_events = [e for e in extract_auto_events(html) if e["date"] >= today.isoformat()]
 
     sporza_events = fetch_sporza_livestreams()
     auvio_events = fetch_auvio_sport_events()
@@ -393,12 +419,12 @@ def main():
 
     added, upgraded = 0, 0
     for e in merged:
-        key = (e["date"], e["sport"], normalize_lbl(e["lbl"]))
-        if key in hand_curated_keys:
+        lbl_key = (e["date"], e["sport"], normalize_lbl(e["lbl"]))
+        if lbl_key in hand_curated_keys:
             continue  # a human already curates this exact event -- never touch it
-        existing = auto_events_by_key.get(key)
+        existing = next((x for x in auto_events if same_broadcast(x, e)), None)
         if existing is None:
-            auto_events_by_key[key] = e
+            auto_events.append(e)
             added += 1
         else:
             new_plat = sorted(set(existing["plat"]) | set(e["plat"]))
@@ -413,10 +439,10 @@ def main():
     # actually in the file, not on whether the fetch layer happened to guess it as
     # "new": a sport we pre-mapped (e.g. Swimming) is just as unstyled on first use
     # as one we fell back to title-casing for.
-    sports_in_play = {e["sport"] for e in auto_events_by_key.values()}
+    sports_in_play = {e["sport"] for e in auto_events}
     html, newly_styled = add_new_sport_styling(html, sports_in_play)
 
-    auto_block = build_auto_block(list(auto_events_by_key.values()))
+    auto_block = build_auto_block(auto_events)
     html = replace_auto_block(html, auto_block)
 
     with open(INDEX_PATH, "w", encoding="utf-8", newline="\n") as f:
