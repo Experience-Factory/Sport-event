@@ -4,6 +4,8 @@
 Fetches:
   - Sporza's own "livestream" widget (precise: only things actually streamed live)
   - RTBF Auvio's live TV planning grid, filtered to sport categories
+  - VTM GO's live TV guide (DPG Media), filtered by sport keywords in the title
+  - RTL Play's live TV guide (DPG Media), filtered by sport keywords in the title
 
 Adds genuinely new events into the AUTO-DETECTED block of index.html,
 rewrites the rolling MONTHS window, and auto-creates CSS/filter entries
@@ -53,6 +55,8 @@ NL_SPORT_MAP = {
     "darts": "Darts", "formule 1": "F1", "f1": "F1", "golf": "Golf",
     "basketbal": "Basketball", "rugby": "Rugby", "zwemmen": "Swimming",
     "boksen": "Boxing", "motorsport": "MotoGP", "handbal": "Handball",
+    "esports": "Esports", "paardensport": "Equestrian", "dressuur": "Equestrian",
+    "springconcours": "Equestrian",
 }
 FR_SPORT_MAP = {
     "cyclisme": "Cycling", "cyclo-cross": "Cyclocross", "football": "Football",
@@ -63,6 +67,8 @@ FR_SPORT_MAP = {
     "gymnastique": "Gymnastics", "aviron": "Rowing", "judo": "Judo",
     "escrime": "Fencing", "voile": "Sailing", "biathlon": "Biathlon",
     "patinage": "Skating", "triathlon": "Triathlon", "ski": "Skiing",
+    "esports": "Esports", "e-sports": "Esports", "équitation": "Equestrian",
+    "jumping": "Equestrian",
 }
 
 DUTCH_MONTHS = {
@@ -167,7 +173,7 @@ def fetch_auvio_sport_events():
             break
 
     out = []
-    unmatched_titles = []
+    auto_named = []
     for it in items:
         cat = (it.get("category") or {}).get("label", "")
         cat_key = cat.strip().lower()
@@ -177,12 +183,17 @@ def fetch_auvio_sport_events():
             # RTBF files almost everything sport-related under one generic "Sport"
             # bucket rather than per-sport categories -- the actual sport name is
             # the lead-in of the title instead, e.g. "Athlétisme - Euro Birmingham 2026".
-            prefix = re.split(r"[-:]", title, maxsplit=1)[0].strip().lower()
-            sport = FR_SPORT_MAP.get(prefix)
-            if sport is None and prefix:
-                unmatched_titles.append(title)
+            # RTBF already decided it belongs under "Sport": trust that and always
+            # include it, using a known nice name where we have one, or a name
+            # derived from the title itself otherwise (never dropped/guessed-out).
+            title_lower = title.lower()
+            sport = next((v for k, v in FR_SPORT_MAP.items() if k in title_lower), None)
+            if sport is None:
+                prefix = re.split(r"[-:]", title, maxsplit=1)[0].strip()
+                sport = prefix.title() if prefix else "Other"
+                auto_named.append((title, sport))
         if sport is None:
-            continue  # not a recognised sport -- conservative, no guessing
+            continue  # category isn't sport-related at all
         start = it.get("start_date", "")
         end = it.get("end_date", "")
         if not start:
@@ -197,13 +208,80 @@ def fetch_auvio_sport_events():
             continue
         out.append({"date": d, "t": t, "lbl": lbl, "sport": sport, "plat": ["auvio"]})
 
-    if unmatched_titles:
+    if auto_named:
         WARNINGS.append(
-            f"RTBF: {len(unmatched_titles)} item(s) under generic 'Sport' category with an "
-            f"unrecognised sport name in the title (not added, needs a FR_SPORT_MAP entry): "
-            f"{sorted(set(unmatched_titles))[:5]}"
+            f"RTBF: {len(auto_named)} item(s) under generic 'Sport' category had no FR_SPORT_MAP "
+            f"entry, named from their title instead (added anyway; consider adding a proper "
+            f"mapping): {sorted(set(s for _, s in auto_named))}"
         )
     return out
+
+
+# ---------- DPG Media (VTM GO / RTL Play share the same backend) ----------
+#
+# Both apps hit lfvp-api.dpgmedia.net behind a WAF that rejects generic/unbranded
+# requests -- it needs headers that plausibly look like the real mobile app,
+# including a current-ish x-app-version (an old one gets HTTP 426 "upgrade
+# required", not blocked outright). No login/token needed for the /live guide.
+# Unlike RTBF there's no genre tag at all here -- every program on every channel
+# comes back, so classification is keyword-matching the program title against
+# NL_SPORT_MAP / FR_SPORT_MAP (only kept when a real match is found -- no
+# generic "Other" fallback here, since without a category to lean on, guessing
+# on arbitrary titles would let regular non-sport programs slip through).
+
+VTM_HEADERS = {
+    "User-Agent": "VTM_GO/25.260415 (be.vmma.vtm.zenderapp; build:30644; Android 30) okhttp/4.11.0",
+    "x-app-version": "25",
+    "x-persgroep-mobile-app": "true",
+    "x-persgroep-os": "android",
+    "x-persgroep-os-version": "30",
+}
+RTL_HEADERS = {
+    "User-Agent": "RTL_PLAY/25.260415 (com.tapptic.rtl.tvi; build:30644; Android 30)",
+    "Accept": "*/*",
+    "lfvp-device-segment": "TV>Android",
+    "x-app-version": "25",
+}
+
+
+def fetch_dpg_live(mode, headers, sport_map, plat_tag, source_label):
+    """Shared fetcher for DPG Media's '/{mode}/live' TV guide (VTM_GO or RTL_PLAY)."""
+    try:
+        raw = fetch(f"https://lfvp-api.dpgmedia.net/{mode}/live", headers=headers)
+        data = json.loads(raw)
+    except Exception as e:
+        WARNINGS.append(f"{source_label} fetch failed: {e}")
+        return []
+
+    out = []
+    for chan in data.get("channels", []):
+        for b in chan.get("broadcasts", []):
+            name = (b.get("name") or "").strip()
+            if not name or name.lower() in ("geen uitzending", "pas d'émission"):
+                continue  # "off air" placeholder slot
+            name_lower = name.lower()
+            sport = next((v for k, v in sport_map.items() if k in name_lower), None)
+            if sport is None:
+                continue  # no recognisable sport keyword -- most programs aren't sport
+            start = b.get("startsAt", "")
+            end = b.get("endsAt", "")
+            if not start:
+                continue
+            d, t_start = start[:10], start[11:16]
+            t_end = end[11:16] if end else ""
+            t = f"{t_start} - {t_end}" if t_end and t_end != t_start else t_start
+            episode = (b.get("episodeTitle") or "").strip()
+            lbl = f"{name} · {episode}" if episode and episode not in name else name
+            out.append({"date": d, "t": t, "lbl": lbl, "sport": sport, "plat": [plat_tag]})
+    return out
+
+
+def fetch_vtm_events():
+    return fetch_dpg_live("VTM_GO", VTM_HEADERS, NL_SPORT_MAP, "vtm", "VTM GO")
+
+
+def fetch_rtl_events():
+    return fetch_dpg_live("RTL_PLAY", RTL_HEADERS, FR_SPORT_MAP, "rtl", "RTL Play")
 
 
 # ---------- merge ----------
@@ -234,20 +312,17 @@ def same_broadcast(a, b):
     return abs(sa - sb) <= SAME_EVENT_TOLERANCE_MIN
 
 
-def merge_sources(sporza_events, auvio_events):
-    merged = list(sporza_events)
-    used_auvio = set()
-    for i, sp in enumerate(sporza_events):
-        for j, av in enumerate(auvio_events):
-            if j in used_auvio:
-                continue
-            if same_broadcast(sp, av):
-                merged[i]["plat"] = sorted(set(merged[i]["plat"]) | set(av["plat"]))
-                used_auvio.add(j)
-                break
-    for j, av in enumerate(auvio_events):
-        if j not in used_auvio:
-            merged.append(av)
+def merge_sources(*event_lists):
+    """Fold any number of source event lists into one, unioning platforms for
+    broadcasts that same_broadcast() considers the same across sources."""
+    merged = []
+    for events in event_lists:
+        for e in events:
+            existing = next((m for m in merged if same_broadcast(m, e)), None)
+            if existing is None:
+                merged.append(dict(e))
+            else:
+                existing["plat"] = sorted(set(existing["plat"]) | set(e["plat"]))
     return merged
 
 
@@ -406,16 +481,20 @@ def main():
 
     sporza_events = fetch_sporza_livestreams()
     auvio_events = fetch_auvio_sport_events()
+    vtm_events = fetch_vtm_events()
+    rtl_events = fetch_rtl_events()
     log(f"Sporza livestream candidates: {len(sporza_events)}")
     log(f"RTBF Auvio sport candidates: {len(auvio_events)}")
+    log(f"VTM GO sport candidates: {len(vtm_events)}")
+    log(f"RTL Play sport candidates: {len(rtl_events)}")
 
-    if not sporza_events and not auvio_events and WARNINGS:
-        log("Both sources failed -- aborting without touching index.html")
+    if not any([sporza_events, auvio_events, vtm_events, rtl_events]) and WARNINGS:
+        log("All sources failed -- aborting without touching index.html")
         for w in WARNINGS:
             log(f"  - {w}")
         sys.exit(1)
 
-    merged = merge_sources(sporza_events, auvio_events)
+    merged = merge_sources(sporza_events, auvio_events, vtm_events, rtl_events)
 
     added, upgraded = 0, 0
     for e in merged:
