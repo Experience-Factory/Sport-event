@@ -36,6 +36,15 @@ EXTRA_PALETTE = [
     ("#f5e0ee", "#c2185b", "#6b0d33"),  # Boxing - crimson
     ("#eef0e0", "#8d9c1f", "#4a5410"),  # MotoGP - olive
     ("#e0e8ff", "#3d5afe", "#1b2b8a"),  # Handball - indigo
+    ("#fde0e0", "#d32f2f", "#7a1414"),  # Gymnastics - red-pink
+    ("#e0fff2", "#00c896", "#006644"),  # Rowing - mint
+    ("#f7e0ff", "#a300cc", "#570070"),  # Judo - magenta-purple
+    ("#fff0f7", "#e91e8c", "#8a0c52"),  # Fencing - pink
+    ("#e0f0ff", "#1565c0", "#0b3a70"),  # Sailing - deep blue
+    ("#f2f0e0", "#9e8b1f", "#544a10"),  # Biathlon - khaki
+    ("#e0f7ff", "#0288a8", "#014b5c"),  # Skating - light teal
+    ("#ffe0ea", "#c2185b", "#6b0d33"),  # Triathlon - rose
+    ("#eef4ff", "#5c7cfa", "#2a3d8a"),  # Skiing - periwinkle
 ]
 
 NL_SPORT_MAP = {
@@ -51,6 +60,9 @@ FR_SPORT_MAP = {
     "fléchettes": "Darts", "formule 1": "F1", "sports mécaniques": "F1",
     "golf": "Golf", "basket": "Basketball", "basketball": "Basketball",
     "rugby": "Rugby", "natation": "Swimming", "boxe": "Boxing", "handball": "Handball",
+    "gymnastique": "Gymnastics", "aviron": "Rowing", "judo": "Judo",
+    "escrime": "Fencing", "voile": "Sailing", "biathlon": "Biathlon",
+    "patinage": "Skating", "triathlon": "Triathlon", "ski": "Skiing",
 }
 
 DUTCH_MONTHS = {
@@ -59,7 +71,6 @@ DUTCH_MONTHS = {
 }
 
 WARNINGS = []
-NEW_SPORTS_SEEN = set()
 
 
 def log(msg):
@@ -105,11 +116,7 @@ def fetch_sporza_livestreams():
             continue
 
         nl_sport = subtitle.split("|")[0].strip().lower() if subtitle else ""
-        sport = NL_SPORT_MAP.get(nl_sport)
-        if sport is None:
-            sport = nl_sport.title() if nl_sport else "Other"
-            if sport != "Other":
-                NEW_SPORTS_SEEN.add(sport)
+        sport = NL_SPORT_MAP.get(nl_sport) or (nl_sport.title() if nl_sport else "Other")
 
         d = parse_dutch_date_label(btn_title, today)
         if d is None:
@@ -160,12 +167,22 @@ def fetch_auvio_sport_events():
             break
 
     out = []
+    unmatched_titles = []
     for it in items:
         cat = (it.get("category") or {}).get("label", "")
         cat_key = cat.strip().lower()
+        title = it.get("title", "").strip()
         sport = FR_SPORT_MAP.get(cat_key)
+        if sport is None and cat_key in ("sport", "sports"):
+            # RTBF files almost everything sport-related under one generic "Sport"
+            # bucket rather than per-sport categories -- the actual sport name is
+            # the lead-in of the title instead, e.g. "Athlétisme - Euro Birmingham 2026".
+            prefix = re.split(r"[-:]", title, maxsplit=1)[0].strip().lower()
+            sport = FR_SPORT_MAP.get(prefix)
+            if sport is None and prefix:
+                unmatched_titles.append(title)
         if sport is None:
-            continue  # not a recognised sport category -- conservative, no guessing
+            continue  # not a recognised sport -- conservative, no guessing
         start = it.get("start_date", "")
         end = it.get("end_date", "")
         if not start:
@@ -179,6 +196,13 @@ def fetch_auvio_sport_events():
         if not lbl:
             continue
         out.append({"date": d, "t": t, "lbl": lbl, "sport": sport, "plat": ["auvio"]})
+
+    if unmatched_titles:
+        WARNINGS.append(
+            f"RTBF: {len(unmatched_titles)} item(s) under generic 'Sport' category with an "
+            f"unrecognised sport name in the title (not added, needs a FR_SPORT_MAP entry): "
+            f"{sorted(set(unmatched_titles))[:5]}"
+        )
     return out
 
 
@@ -310,34 +334,34 @@ def replace_months(html, months):
     return pattern.sub(build_months_js(months).replace("\\", "\\\\"), html, count=1)
 
 
-def add_new_sport_styling(html, new_sports):
-    if not new_sports:
-        return html
+def add_new_sport_styling(html, sports_in_play):
+    """Ensure every sport currently in play has a CSS rule + filter button.
+    Returns (html, list of sports newly styled by this call)."""
+    unstyled = [s for s in sorted(sports_in_play) if not re.search(rf"\.s-{re.escape(s)}\{{", html)]
+    if not unstyled:
+        return html, []
+
     used_colors = set(re.findall(r"\.s-[A-Za-z]+\{[^}]*border-color:(#[0-9a-fA-F]{6})", html))
-    palette = [p for p in EXTRA_PALETTE if p[1] not in used_colors]
+    palette = [p for p in EXTRA_PALETTE if p[1] not in used_colors] or EXTRA_PALETTE
 
     css_lines = []
     btn_lines = []
-    for i, sport in enumerate(sorted(new_sports)):
-        if re.search(rf"\.s-{re.escape(sport)}\{{", html):
-            continue  # already styled (e.g. added in a previous run)
+    for i, sport in enumerate(unstyled):
         bg, border, text = palette[i % len(palette)]
         css_lines.append(f"  .s-{sport}{{background:{bg};border-color:{border};color:{text}}}")
         btn_lines.append(f'    <button data-f="{sport}">{sport}</button>')
 
-    if css_lines:
-        html = html.replace(
-            "  .s-Darts{background:#e5f6ec;border-color:#12a150;color:#0a5c2e}",
-            "  .s-Darts{background:#e5f6ec;border-color:#12a150;color:#0a5c2e}\n" + "\n".join(css_lines),
-            1,
-        )
-    if btn_lines:
-        html = html.replace(
-            '    <button data-f="Darts">Darts</button>',
-            '    <button data-f="Darts">Darts</button>\n' + "\n".join(btn_lines),
-            1,
-        )
-    return html
+    html = html.replace(
+        "  .s-Darts{background:#e5f6ec;border-color:#12a150;color:#0a5c2e}",
+        "  .s-Darts{background:#e5f6ec;border-color:#12a150;color:#0a5c2e}\n" + "\n".join(css_lines),
+        1,
+    )
+    html = html.replace(
+        '    <button data-f="Darts">Darts</button>',
+        '    <button data-f="Darts">Darts</button>\n' + "\n".join(btn_lines),
+        1,
+    )
+    return html, unstyled
 
 
 def main():
@@ -385,7 +409,12 @@ def main():
     months = rolling_months(today)
     html = replace_months(html, months)
 
-    html = add_new_sport_styling(html, NEW_SPORTS_SEEN)
+    # style/filter-button any sport in play that isn't styled yet -- based on what's
+    # actually in the file, not on whether the fetch layer happened to guess it as
+    # "new": a sport we pre-mapped (e.g. Swimming) is just as unstyled on first use
+    # as one we fell back to title-casing for.
+    sports_in_play = {e["sport"] for e in auto_events_by_key.values()}
+    html, newly_styled = add_new_sport_styling(html, sports_in_play)
 
     auto_block = build_auto_block(list(auto_events_by_key.values()))
     html = replace_auto_block(html, auto_block)
@@ -394,15 +423,15 @@ def main():
         f.write(html)
 
     log(f"New events added: {added}  (platform upgrades on existing: {upgraded})")
-    if NEW_SPORTS_SEEN:
-        log(f"New sport categories introduced: {sorted(NEW_SPORTS_SEEN)}")
+    if newly_styled:
+        log(f"New sport categories styled: {newly_styled}")
     if WARNINGS:
         log("Warnings:")
         for w in WARNINGS:
             log(f"  - {w}")
 
     print(f"SUMMARY: {added} new event(s), {upgraded} platform upgrade(s)"
-          + (f", new sports: {sorted(NEW_SPORTS_SEEN)}" if NEW_SPORTS_SEEN else "")
+          + (f", new sports styled: {newly_styled}" if newly_styled else "")
           + (f", {len(WARNINGS)} warning(s)" if WARNINGS else ""))
 
 
