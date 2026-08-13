@@ -277,6 +277,25 @@ const MONTHS=[
 const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const root=document.getElementById('cal');
 
+function evSortMinutes(t){
+  t=(t||'').toLowerCase();
+  let m=t.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)/); // "3pm", "1:30pm", "aft. ~5:30pm"
+  if(m){
+    let h=parseInt(m[1],10)%12;
+    if(m[3]==='pm')h+=12;
+    return h*60+(m[2]?parseInt(m[2],10):0);
+  }
+  m=t.match(/(\d{1,2}):(\d{2})/); // 24h "11:45 - 13:45", "~16:00", "05:00"
+  if(m)return parseInt(m[1],10)*60+parseInt(m[2],10);
+  if(t.includes('morning'))return 9*60;
+  if(t.startsWith('aft')||t.includes('afternoon'))return 15*60;
+  if(t.includes('evening'))return 20*60;
+  return 9999; // TBC / "see prog." / unrecognised -- sort after everything with a known time
+}
+function sortEvents(evs){
+  return evs.slice().sort((a,b)=>evSortMinutes(a.t)-evSortMinutes(b.t)||a.sport.localeCompare(b.sport));
+}
+
 function render(filter){
   root.innerHTML='';
   MONTHS.forEach(M=>{
@@ -292,7 +311,7 @@ function render(filter){
       const we=(dt.getDay()===0||dt.getDay()===6);
       const cell=document.createElement('div');
       cell.className='cell'+(we?' we':'');
-      const evs=(MAP[key(M.y,M.m,d)]||[]).filter(e=>filter==='all'||e.sport===filter);
+      const evs=sortEvents((MAP[key(M.y,M.m,d)]||[]).filter(e=>filter==='all'||e.sport===filter));
       if(evs.length)cell.classList.add('has');
       const dn=document.createElement('div');dn.className='daynum';dn.innerHTML='<span class="wd">'+DOW[(new Date(M.y,M.m,d).getDay()+6)%7]+' </span>'+d;cell.appendChild(dn);
       evs.forEach(e=>{
