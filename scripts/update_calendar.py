@@ -60,6 +60,7 @@ NL_SPORT_MAP = {
     "badminton": "Badminton", "waterpolo": "WaterPolo", "triatlon": "Triathlon",
     "zeilen": "Sailing", "boogschieten": "Archery", "roeien": "Rowing",
     "schermen": "Fencing", "schaatsen": "Skating", "basketbal (v)": "Basketball",
+    "mountainbike": "MTB", "triathlon": "Triathlon", "wielrennen (v)": "Cycling",
 }
 FR_SPORT_MAP = {
     "cyclisme": "Cycling", "cyclo-cross": "Cyclocross", "football": "Football",
@@ -93,24 +94,70 @@ def fetch(url, headers=None):
 
 
 # ---------- Sporza ----------
+#
+# Sporza's site runs on React Router 7's "single fetch" mode: route data is no
+# longer inlined as a plain JSON blob in the HTML (the old window.__remixContext
+# approach) -- it's served from a `<route>.data` endpoint in the `turbo-stream`
+# wire format (a flat JSON array of values where objects/arrays hold references
+# -- by index -- to other array slots, so shared/repeated values aren't
+# duplicated). No official Python client for this exists; decode_turbo_stream()
+# below is a minimal reimplementation covering the value shapes Sporza actually
+# uses (plain objects/arrays/scalars, Map). Reference: jacob-ebey/turbo-stream.
+
+TS_SPECIAL = {-1: None, -2: float("nan"), -3: float("-inf"), -4: -0.0, -5: None, -6: float("inf"), -7: None}
+TS_TYPE_TAGS = {"B", "D", "E", "M", "N", "P", "R", "S", "Y", "U", "Z"}
+
+
+def decode_turbo_stream(text):
+    flat = json.loads(text)
+    cache = {}
+
+    def resolve(idx):
+        if idx < 0:
+            return TS_SPECIAL.get(idx)
+        if idx in cache:
+            return cache[idx]
+        raw = flat[idx]
+        if isinstance(raw, dict):
+            result = {}
+            cache[idx] = result
+            for k, v_idx in raw.items():
+                result[resolve(int(k[1:]))] = resolve(v_idx)
+            return result
+        if isinstance(raw, list):
+            if raw and isinstance(raw[0], str) and raw[0] in TS_TYPE_TAGS:
+                tag = raw[0]
+                if tag == "M":
+                    result = {}
+                    cache[idx] = result
+                    for i in range(1, len(raw), 2):
+                        result[resolve(raw[i])] = resolve(raw[i + 1])
+                    return result
+                if tag == "S":
+                    result = [resolve(i) for i in raw[1:]]
+                    cache[idx] = result
+                    return result
+                if tag in ("P", "Z"):
+                    return resolve(raw[1]) if len(raw) > 1 else None
+                return raw  # D/R/U/B/Y/E/N -- not needed for our data
+            result = []
+            cache[idx] = result
+            for el_idx in raw:
+                result.append(resolve(el_idx))
+            return result
+        return raw  # literal scalar
+
+    return resolve(0)
+
 
 def fetch_sporza_livestreams():
     """Return list of {date, t, lbl, sport, plat} from Sporza's own live widget."""
     try:
-        html = fetch("https://sporza.be/nl/kalender")
+        raw = fetch("https://sporza.be/nl/kalender.data", headers={"Accept": "text/x-script"})
+        decoded = decode_turbo_stream(raw)
+        items = decoded["routes/nl.kalender"]["data"]["page"]["header"][0]["componentProps"]["items"]
     except Exception as e:
-        WARNINGS.append(f"Sporza fetch failed: {e}")
-        return []
-
-    m = re.search(r"window\.__remixContext\s*=\s*(\{.*?\});", html, re.S)
-    if not m:
-        WARNINGS.append("Sporza: could not find __remixContext in page HTML (site may have changed)")
-        return []
-    try:
-        ctx = json.loads(m.group(1))
-        items = ctx["state"]["loaderData"]["routes/nl.kalender"]["page"]["header"][0]["componentProps"]["items"]
-    except Exception as e:
-        WARNINGS.append(f"Sporza: unexpected data shape ({e}) -- site may have changed")
+        WARNINGS.append(f"Sporza fetch/decode failed: {e} -- site may have changed again")
         return []
 
     today = date.today()
@@ -119,20 +166,26 @@ def fetch_sporza_livestreams():
         props = it.get("componentProps", {})
         title = props.get("title", "").strip()
         subtitle = props.get("subtitle", "")
+        btn = props.get("button") or {}
         time_text = (props.get("time") or {}).get("text", "")
-        btn_title = (props.get("button") or {}).get("title", "")
         if not title:
             continue
 
         nl_sport = subtitle.split("|")[0].strip().lower() if subtitle else ""
         sport = NL_SPORT_MAP.get(nl_sport) or (nl_sport.title() if nl_sport else "Other")
 
-        d = parse_dutch_date_label(btn_title, today)
-        if d is None:
-            WARNINGS.append(f"Sporza: could not parse date label '{btn_title}' for '{title}' -- skipped")
-            continue
+        if btn.get("status") == "LIVE" or not time_text:
+            # currently airing right now -- the widget only gives a completion
+            # %, not a start/end time, at this point
+            d, t = today, "Live now"
+        else:
+            d = parse_dutch_date_label(btn.get("title", ""), today)
+            if d is None:
+                WARNINGS.append(f"Sporza: could not parse date label '{btn.get('title')}' for '{title}' -- skipped")
+                continue
+            t = time_text or "TBC"
 
-        out.append({"date": d.isoformat(), "t": time_text or "TBC", "lbl": title, "sport": sport, "plat": ["vrt"]})
+        out.append({"date": d.isoformat(), "t": t, "lbl": title, "sport": sport, "plat": ["vrt"]})
     return out
 
 
