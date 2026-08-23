@@ -49,6 +49,7 @@
   .cell{background:var(--surface);border:1px solid var(--line);border-radius:8px;min-height:96px;padding:4px 5px 6px;overflow:hidden}
   .cell.lead{background:transparent;border:none}
   .cell.we{background:#fbfbfd}
+  .cell.past{opacity:.4}
   .daynum{font-size:.72rem;font-weight:700;color:#3a3f52;margin-bottom:2px}
   .cell.has .daynum{color:var(--black)}
   .daynum .wd{display:none}
@@ -318,12 +319,14 @@ function render(filter){
     const lead=(first.getDay()+6)%7;
     for(let i=0;i<lead;i++){const c=document.createElement('div');c.className='cell lead';grid.appendChild(c);}
     const nDays=new Date(M.y,M.m+1,0).getDate();
+    const todayStart=new Date();todayStart.setHours(0,0,0,0);
     for(let d=1;d<=nDays;d++){
       const dt=new Date(M.y,M.m,d);
       const we=(dt.getDay()===0||dt.getDay()===6);
+      const isPast=dt<todayStart;
       const cell=document.createElement('div');
-      cell.className='cell'+(we?' we':'');
-      const evs=sortEvents((MAP[key(M.y,M.m,d)]||[]).filter(e=>filter==='all'||e.sport===filter));
+      cell.className='cell'+(we?' we':'')+(isPast?' past':'');
+      const evs=isPast?[]:sortEvents((MAP[key(M.y,M.m,d)]||[]).filter(e=>filter==='all'||e.sport===filter));
       if(evs.length)cell.classList.add('has');
       const dn=document.createElement('div');dn.className='daynum';dn.innerHTML='<span class="wd">'+DOW[(new Date(M.y,M.m,d).getDay()+6)%7]+' </span>'+d;cell.appendChild(dn);
       evs.forEach(e=>{
