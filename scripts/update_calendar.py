@@ -443,6 +443,51 @@ def extract_hand_curated_keys(html):
     return _add_call_keys(fragment)
 
 
+_ADD_LINE_RE = re.compile(r"^add\('(\d{4}-\d{2}-\d{2})',(\{.*\})\);\s*$")
+_ADD_RANGE_LINE_RE = re.compile(
+    r"^addRange\('(\d{4}-\d{2}-\d{2})','(\d{4}-\d{2}-\d{2})',(\{.*?\})(,\[[^\]]*\])?\);\s*$"
+)
+
+
+def prune_past_hand_curated(html, today):
+    """Drop/trim hand-curated add()/addRange() calls that are entirely in the
+    past. A one-off single-day entry before today is deleted outright; a
+    multi-day addRange that started in the past but still runs into the
+    future has its start date pulled forward to today instead of being
+    dropped, so the still-upcoming days stay. Only touches the section above
+    AUTO_START -- the auto-detected block already prunes itself every run."""
+    idx = html.find(AUTO_START)
+    if idx == -1:
+        return html, 0
+    head, tail = html[:idx], html[idx:]
+    today_iso = today.isoformat()
+    removed = 0
+    out_lines = []
+    for line in head.splitlines(keepends=True):
+        stripped = line.rstrip("\r\n")
+        m = _ADD_LINE_RE.match(stripped)
+        if m:
+            if m.group(1) < today_iso:
+                removed += 1
+                continue
+            out_lines.append(line)
+            continue
+        m = _ADD_RANGE_LINE_RE.match(stripped)
+        if m:
+            start, end, body, skip = m.group(1), m.group(2), m.group(3), m.group(4) or ""
+            if end < today_iso:
+                removed += 1
+                continue
+            if start < today_iso:
+                skip = re.sub(r"'(\d{4}-\d{2}-\d{2})'", lambda sm: sm.group(0) if sm.group(1) >= today_iso else "", skip)
+                skip = re.sub(r",\s*,", ",", skip).replace("[,", "[").replace(",]", "]")
+                newline = f"addRange('{today_iso}','{end}',{body}{skip});" + line[len(stripped):]
+                out_lines.append(newline)
+                continue
+        out_lines.append(line)
+    return "".join(out_lines) + tail, removed
+
+
 def extract_auto_events(html):
     """Structured events currently in the AUTO-DETECTED block (empty if not present yet)."""
     m = re.search(re.escape(AUTO_START) + r"(.*?)" + re.escape(AUTO_END), html, re.S)
@@ -545,8 +590,9 @@ def main():
     with open(INDEX_PATH, "r", encoding="utf-8") as f:
         html = f.read()
 
-    hand_curated_keys = extract_hand_curated_keys(html)
     today = date.today()
+    html, pruned = prune_past_hand_curated(html, today)
+    hand_curated_keys = extract_hand_curated_keys(html)
 
     # carry forward previous auto-added events that are still upcoming; drop past ones
     # (they're inert anyway once MONTHS rolls past them, no need to keep bloating the file).
@@ -604,6 +650,8 @@ def main():
         f.write(html)
 
     log(f"New events added: {added}  (platform upgrades on existing: {upgraded})")
+    if pruned:
+        log(f"Hand-curated past entries pruned: {pruned}")
     if newly_styled:
         log(f"New sport categories styled: {newly_styled}")
     if WARNINGS:
@@ -612,6 +660,7 @@ def main():
             log(f"  - {w}")
 
     print(f"SUMMARY: {added} new event(s), {upgraded} platform upgrade(s)"
+          + (f", {pruned} past hand-curated entr{'y' if pruned==1 else 'ies'} pruned" if pruned else "")
           + (f", new sports styled: {newly_styled}" if newly_styled else "")
           + (f", {len(WARNINGS)} warning(s)" if WARNINGS else ""))
 
