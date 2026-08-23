@@ -56,7 +56,10 @@ NL_SPORT_MAP = {
     "basketbal": "Basketball", "rugby": "Rugby", "zwemmen": "Swimming",
     "boksen": "Boxing", "motorsport": "MotoGP", "handbal": "Handball",
     "esports": "Esports", "paardensport": "Equestrian", "dressuur": "Equestrian",
-    "springconcours": "Equestrian",
+    "springconcours": "Equestrian", "turnen": "Gymnastics", "volleybal": "Volleyball",
+    "badminton": "Badminton", "waterpolo": "WaterPolo", "triatlon": "Triathlon",
+    "zeilen": "Sailing", "boogschieten": "Archery", "roeien": "Rowing",
+    "schermen": "Fencing", "schaatsen": "Skating", "basketbal (v)": "Basketball",
 }
 FR_SPORT_MAP = {
     "cyclisme": "Cycling", "cyclo-cross": "Cyclocross", "football": "Football",
@@ -174,6 +177,7 @@ def fetch_auvio_sport_events():
 
     out = []
     auto_named = []
+    skipped_non_sport = []
     for it in items:
         cat = (it.get("category") or {}).get("label", "")
         cat_key = cat.strip().lower()
@@ -183,17 +187,30 @@ def fetch_auvio_sport_events():
             # RTBF files almost everything sport-related under one generic "Sport"
             # bucket rather than per-sport categories -- the actual sport name is
             # the lead-in of the title instead, e.g. "Athlétisme - Euro Birmingham 2026".
-            # RTBF already decided it belongs under "Sport": trust that and always
-            # include it, using a known nice name where we have one, or a name
-            # derived from the title itself otherwise (never dropped/guessed-out).
+            # RTBF already decided it belongs under "Sport": trust that and include it,
+            # using a known nice name where we have one, or a name derived from the
+            # title itself otherwise -- but only when that derived name still looks
+            # like a sport (short, no punctuation): the "Sport" bucket also carries
+            # magazine shows / documentaries ABOUT a sport (e.g. "The Red Lions, a
+            # better place"), and blindly title-casing those made a garbage
+            # "sport" category (broke the CSS, since sport names feed unescaped
+            # into a class selector -- a comma splits it into multiple invalid
+            # selectors) instead of just skipping a non-live item.
             title_lower = title.lower()
             sport = next((v for k, v in FR_SPORT_MAP.items() if k in title_lower), None)
             if sport is None:
+                # sport is used directly as a CSS class and a data-f attribute value
+                # elsewhere, so it must be a single clean word -- not just "short":
+                # a space or comma in there produces an invalid/broken selector.
                 prefix = re.split(r"[-:]", title, maxsplit=1)[0].strip()
-                sport = prefix.title() if prefix else "Other"
-                auto_named.append((title, sport))
+                words = prefix.split()
+                if len(words) == 1 and 2 <= len(words[0]) <= 16 and words[0].isalpha():
+                    sport = words[0].title()
+                    auto_named.append((title, sport))
+                elif prefix:
+                    skipped_non_sport.append(title)
         if sport is None:
-            continue  # category isn't sport-related at all
+            continue  # category isn't sport-related, or looked like a non-sport show
         start = it.get("start_date", "")
         end = it.get("end_date", "")
         if not start:
@@ -213,6 +230,12 @@ def fetch_auvio_sport_events():
             f"RTBF: {len(auto_named)} item(s) under generic 'Sport' category had no FR_SPORT_MAP "
             f"entry, named from their title instead (added anyway; consider adding a proper "
             f"mapping): {sorted(set(s for _, s in auto_named))}"
+        )
+    if skipped_non_sport:
+        WARNINGS.append(
+            f"RTBF: {len(skipped_non_sport)} item(s) under generic 'Sport' category skipped -- "
+            f"title didn't look like a sport name (likely a magazine/documentary show, not a "
+            f"live broadcast): {sorted(set(skipped_non_sport))[:5]}"
         )
     return out
 
