@@ -183,7 +183,7 @@ function addRange(start,end,ev,skip){
 }
 
 // --- Multi-day series ---
-addRange('2026-08-31','2026-09-13',{t:'aft. ~5:30pm',lbl:'Vuelta a España — stage',sport:'Cycling',plat:['auvio','vrt']});
+addRange('2026-09-01','2026-09-13',{t:'aft. ~5:30pm',lbl:'Vuelta a España — stage',sport:'Cycling',plat:['auvio','vrt']});
 addRange('2026-09-20','2026-09-27',{t:'evening',lbl:'Road World Championships (Montréal)',sport:'Cycling',plat:['auvio','vrt']});
 addRange('2026-10-13','2026-10-18',{t:'morning',lbl:'Tour of Guangxi — stage',sport:'Cycling',plat:['auvio','vrt']});
 addRange('2026-12-10','2026-12-31',{t:'1:30pm & 8pm',lbl:'PDC World Darts Championship',sport:'Darts',plat:['vtm']},['2026-12-24','2026-12-25','2026-12-26']);
@@ -258,11 +258,13 @@ add('2026-12-27',{t:'~3pm',lbl:'Cyclocross · World Cup Namur',sport:'Cyclocross
 add('2026-12-29',{t:'~3pm',lbl:'Cyclocross · World Cup Besançon',sport:'Cyclocross',plat:['vrt']});
 
 // --- AUTO-DETECTED (daily bot — do not hand-edit below this line) ---
+add('2026-09-01',{t:'14:48 - 18:04',lbl:'Cyclisme - La Vuelta · Etape 10 : Alcaraz >Elche de la Sierra',sport:'Cycling',plat:['auvio']});
 add('2026-09-01',{t:'14:55 - 17:30',lbl:'Yellow Tigers - Duitsland',sport:'Volleyball',plat:['vrt']});
 add('2026-09-02',{t:'20:00 - 21:59',lbl:'OH Leuven - Czarni Sosnowiec',sport:'Football',plat:['vrt']});
 add('2026-09-03',{t:'13:30 - 17:50',lbl:'Vuelta: rit 12',sport:'Cycling',plat:['vrt']});
 add('2026-09-04',{t:'19:15 - 22:00',lbl:'Memorial Ivo Van Damme',sport:'Athletics',plat:['vrt']});
 add('2026-09-04',{t:'17:20 - 19:15',lbl:'België - Turkije',sport:'Basketball',plat:['vrt']});
+add('2026-09-04',{t:'18:50 - 22:30',lbl:'Red Dragons - Tsjechië',sport:'Volleyball',plat:['vrt']});
 add('2026-09-05',{t:'19:10 - 22:00',lbl:'Memorial Ivo Van Damme',sport:'Athletics',plat:['vrt']});
 add('2026-09-05',{t:'15:00 - 17:50',lbl:'Vuelta: rit 14',sport:'Cycling',plat:['vrt']});
 add('2026-09-06',{t:'17:35 - 19:35',lbl:'Puerto Rico - België',sport:'Basketball',plat:['vrt']});
@@ -273,11 +275,11 @@ add('2026-09-13',{t:'19:50 - 22:00',lbl:'Finale WK basketbal vrouwen',sport:'Bas
 
 // ---- Render ----
 const MONTHS=[
-  {name:'August 2026',y:2026,m:7},
   {name:'September 2026',y:2026,m:8},
   {name:'October 2026',y:2026,m:9},
   {name:'November 2026',y:2026,m:10},
   {name:'December 2026',y:2026,m:11},
+  {name:'January 2027',y:2027,m:0},
 ];
 const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const root=document.getElementById('cal');
