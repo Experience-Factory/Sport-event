@@ -63,6 +63,7 @@
   .s-Hockey{background:#fde8f1;border-color:#e5197d;color:#8a0f4a}
   .s-Athletics{background:#e2f6fd;border-color:#00adef;color:#045e80}
   .s-Darts{background:#e5f6ec;border-color:#12a150;color:#0a5c2e}
+  .s-Tennis{background:#f2f0e0;border-color:#9e8b1f;color:#544a10}
   .s-Superbike{background:#fff0f7;border-color:#e91e8c;color:#8a0c52}
   .s-Wec{background:#e0f0ff;border-color:#1565c0;color:#0b3a70}
   .s-Equestrian{background:#f7e0ff;border-color:#a300cc;color:#570070}
@@ -135,6 +136,7 @@
     <button data-f="Hockey">Hockey</button>
     <button data-f="Athletics">Athletics</button>
     <button data-f="Darts">Darts</button>
+    <button data-f="Tennis">Tennis</button>
     <button data-f="Superbike">Superbike</button>
     <button data-f="Wec">Wec</button>
     <button data-f="Equestrian">Equestrian</button>
@@ -187,7 +189,7 @@ function addRange(start,end,ev,skip){
 }
 
 // --- Multi-day series ---
-addRange('2026-09-05','2026-09-13',{t:'aft. ~5:30pm',lbl:'Vuelta a España — stage',sport:'Cycling',plat:['auvio','vrt']});
+addRange('2026-09-06','2026-09-13',{t:'aft. ~5:30pm',lbl:'Vuelta a España — stage',sport:'Cycling',plat:['auvio','vrt']});
 addRange('2026-09-20','2026-09-27',{t:'evening',lbl:'Road World Championships (Montréal)',sport:'Cycling',plat:['auvio','vrt']});
 addRange('2026-10-13','2026-10-18',{t:'morning',lbl:'Tour of Guangxi — stage',sport:'Cycling',plat:['auvio','vrt']});
 addRange('2026-12-10','2026-12-31',{t:'1:30pm & 8pm',lbl:'PDC World Darts Championship',sport:'Darts',plat:['vtm']},['2026-12-24','2026-12-25','2026-12-26']);
@@ -195,7 +197,6 @@ addRange('2026-12-10','2026-12-31',{t:'1:30pm & 8pm',lbl:'PDC World Darts Champi
 // --- Hockey World Cup — Belgium group matches (Wavre) ---
 
 // --- F1 (Belgian time) ---
-add('2026-09-05',{t:'~16:00',lbl:'F1 · Italian GP — Qualifying',sport:'F1',plat:['auvio','vrt']});
 add('2026-09-12',{t:'~16:00',lbl:'F1 · Spanish GP — Qualifying',sport:'F1',plat:['auvio','vrt']});
 add('2026-09-25',{t:'~13:00',lbl:'F1 · Azerbaijan GP — Qualifying',sport:'F1',plat:['auvio','vrt']});
 add('2026-10-10',{t:'~15:00',lbl:'F1 · Singapore GP — Qualifying',sport:'F1',plat:['auvio','vrt']});
@@ -239,7 +240,6 @@ add('2026-10-10',{t:'aft. ~5pm',lbl:'Il Lombardia (Tour of Lombardy)',sport:'Cyc
 add('2026-10-11',{t:'aft. ~5pm',lbl:'Paris–Tours',sport:'Cycling',plat:['auvio','vrt']});
 
 // --- Athletics ---
-add('2026-09-05',{t:'~7pm',lbl:'Memorial Van Damme (day 2)',sport:'Athletics',plat:['auvio','vrt']});
 
 // --- Cyclocross ---
 add('2026-10-25',{t:'~3pm',lbl:'Cyclocross · Druivencross Overijse',sport:'Cyclocross',plat:['vrt']});
@@ -261,18 +261,18 @@ add('2026-12-27',{t:'~3pm',lbl:'Cyclocross · World Cup Namur',sport:'Cyclocross
 add('2026-12-29',{t:'~3pm',lbl:'Cyclocross · World Cup Besançon',sport:'Cyclocross',plat:['vrt']});
 
 // --- AUTO-DETECTED (daily bot — do not hand-edit below this line) ---
-add('2026-09-05',{t:'19:10 - 22:00',lbl:'Memorial Ivo Van Damme',sport:'Athletics',plat:['auvio','vrt']});
-add('2026-09-05',{t:'15:00 - 17:50',lbl:'Vuelta: rit 14',sport:'Cycling',plat:['auvio','vrt']});
-add('2026-09-05',{t:'12:55 - 16:30',lbl:'Superbike - Grand Prix France · Courses Samedi',sport:'Superbike',plat:['auvio']});
-add('2026-09-05',{t:'15:00 - 17:30',lbl:'Turkije - Servië',sport:'Volleyball',plat:['vrt']});
-add('2026-09-05',{t:'18:00 - 20:30',lbl:'Polen - Italië',sport:'Volleyball',plat:['vrt']});
-add('2026-09-05',{t:'21:53 - 23:40',lbl:'WEC - Lone Star Le Mans · Hyperpole',sport:'Wec',plat:['auvio']});
-add('2026-09-06',{t:'17:35 - 19:35',lbl:'Puerto Rico - België',sport:'Basketball',plat:['vrt']});
+add('2026-09-06',{t:'17:35 - 19:35',lbl:'Puerto Rico - België',sport:'Basketball',plat:['auvio','vrt']});
+add('2026-09-06',{t:'14:48 - 18:09',lbl:'Cyclisme - La Vuelta · Etape 15 : Palma del Rio > Cordoba',sport:'Cycling',plat:['auvio']});
 add('2026-09-06',{t:'12:35 - 16:15',lbl:'Superbike - Grand Prix France · Courses Dimanche',sport:'Superbike',plat:['auvio']});
 add('2026-09-06',{t:'17:50 - 20:30',lbl:'Finale',sport:'Volleyball',plat:['vrt']});
-add('2026-09-07',{t:'11:20 - 13:20',lbl:'België - Australië',sport:'Basketball',plat:['vrt']});
+add('2026-09-06',{t:'19:45 - 02:30',lbl:'WEC - Lone Star Le Mans · La Course en intégralité',sport:'Wec',plat:['auvio']});
+add('2026-09-07',{t:'11:20 - 13:20',lbl:'België - Australië',sport:'Basketball',plat:['auvio','vrt']});
+add('2026-09-11',{t:'13:40 - 14:50',lbl:'Duitsland - België',sport:'Basketball',plat:['vrt']});
+add('2026-09-11',{t:'20:15 - 21:35',lbl:'Polen - België',sport:'Basketball',plat:['vrt']});
 add('2026-09-11',{t:'13:30 - 17:50',lbl:'Vuelta: rit 19',sport:'Cycling',plat:['vrt']});
+add('2026-09-11',{t:'15:50 - 18:30',lbl:'Nederland - Red Dragons',sport:'Volleyball',plat:['vrt']});
 add('2026-09-13',{t:'19:50 - 22:00',lbl:'Finale WK basketbal vrouwen',sport:'Basketball',plat:['vrt']});
+add('2026-09-27',{t:'11:00 - 21:00',lbl:'Finale',sport:'Tennis',plat:['vrt']});
 // --- end auto-detected ---
 
 // ---- Render ----
