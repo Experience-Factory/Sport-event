@@ -63,6 +63,7 @@
   .s-Hockey{background:#fde8f1;border-color:#e5197d;color:#8a0f4a}
   .s-Athletics{background:#e2f6fd;border-color:#00adef;color:#045e80}
   .s-Darts{background:#e5f6ec;border-color:#12a150;color:#0a5c2e}
+  .s-Badminton{background:#e0f7ff;border-color:#0288a8;color:#014b5c}
   .s-Tennis{background:#f2f0e0;border-color:#9e8b1f;color:#544a10}
   .s-Superbike{background:#fff0f7;border-color:#e91e8c;color:#8a0c52}
   .s-Wec{background:#e0f0ff;border-color:#1565c0;color:#0b3a70}
@@ -136,6 +137,7 @@
     <button data-f="Hockey">Hockey</button>
     <button data-f="Athletics">Athletics</button>
     <button data-f="Darts">Darts</button>
+    <button data-f="Badminton">Badminton</button>
     <button data-f="Tennis">Tennis</button>
     <button data-f="Superbike">Superbike</button>
     <button data-f="Wec">Wec</button>
@@ -189,7 +191,7 @@ function addRange(start,end,ev,skip){
 }
 
 // --- Multi-day series ---
-addRange('2026-09-10','2026-09-13',{t:'aft. ~5:30pm',lbl:'Vuelta a España — stage',sport:'Cycling',plat:['auvio','vrt']});
+addRange('2026-09-11','2026-09-13',{t:'aft. ~5:30pm',lbl:'Vuelta a España — stage',sport:'Cycling',plat:['auvio','vrt']});
 addRange('2026-09-20','2026-09-27',{t:'evening',lbl:'Road World Championships (Montréal)',sport:'Cycling',plat:['auvio','vrt']});
 addRange('2026-10-13','2026-10-18',{t:'morning',lbl:'Tour of Guangxi — stage',sport:'Cycling',plat:['auvio','vrt']});
 addRange('2026-12-10','2026-12-31',{t:'1:30pm & 8pm',lbl:'PDC World Darts Championship',sport:'Darts',plat:['vtm']},['2026-12-24','2026-12-25','2026-12-26']);
@@ -259,16 +261,23 @@ add('2026-12-27',{t:'~3pm',lbl:'Cyclocross · World Cup Namur',sport:'Cyclocross
 add('2026-12-29',{t:'~3pm',lbl:'Cyclocross · World Cup Besançon',sport:'Cyclocross',plat:['vrt']});
 
 // --- AUTO-DETECTED (daily bot — do not hand-edit below this line) ---
-add('2026-09-10',{t:'17:35 - 19:35',lbl:'België - Duitsland',sport:'Basketball',plat:['auvio','vrt']});
-add('2026-09-10',{t:'14:50 - 18:00',lbl:'Vueta · Etape 18: El Puerto Santa Maria >Jerez Frontera',sport:'Cycling',plat:['auvio']});
-add('2026-09-11',{t:'13:40 - 14:50',lbl:'Duitsland - België',sport:'Basketball',plat:['vrt']});
-add('2026-09-11',{t:'20:15 - 21:35',lbl:'Polen - België',sport:'Basketball',plat:['vrt']});
-add('2026-09-11',{t:'13:30 - 17:50',lbl:'Vuelta: rit 19',sport:'Cycling',plat:['vrt']});
+add('2026-09-11',{t:'18:58 - 22:25',lbl:'Athlétisme - Ultimate Championship',sport:'Athletics',plat:['auvio']});
+add('2026-09-11',{t:'13:40 - 14:50',lbl:'Duitsland - België',sport:'Basketball',plat:['auvio','vrt']});
+add('2026-09-11',{t:'20:15 - 21:35',lbl:'Polen - België',sport:'Basketball',plat:['auvio','vrt']});
+add('2026-09-11',{t:'13:30 - 17:50',lbl:'Vuelta: rit 19',sport:'Cycling',plat:['auvio','vrt']});
+add('2026-09-11',{t:'13:00 - 16:55',lbl:'Blåkläder Flanders Darts Trophy · Ronde 1',sport:'Darts',plat:['vtm']});
 add('2026-09-11',{t:'08:58 - 11:45',lbl:'MotoGP - Grand Prix Saint-Marin · Essais libres 1',sport:'Motogp',plat:['auvio']});
+add('2026-09-11',{t:'13:13 - 16:15',lbl:'MotoGP - Grand Prix Saint-Marin · Essais libres',sport:'Motogp',plat:['auvio']});
 add('2026-09-11',{t:'15:50 - 18:30',lbl:'Nederland - Red Dragons',sport:'Volleyball',plat:['vrt']});
+add('2026-09-11',{t:'13:51 - 15:40',lbl:'WRC - Rallye Chili · ES1 & ES2',sport:'Wrc',plat:['auvio']});
+add('2026-09-11',{t:'20:07 - 21:05',lbl:'WRC - Rallye Chili · ES4',sport:'Wrc',plat:['auvio']});
+add('2026-09-12',{t:'15:00 - 20:00',lbl:'Yonex International',sport:'Badminton',plat:['vrt']});
 add('2026-09-12',{t:'14:55 - 15:35',lbl:'België - Zwitserland',sport:'Basketball',plat:['vrt']});
 add('2026-09-12',{t:'20:50 - 21:50',lbl:'Servië - België',sport:'Basketball',plat:['vrt']});
 add('2026-09-12',{t:'13:30 - 17:50',lbl:'Vuelta: rit 20',sport:'Cycling',plat:['vrt']});
+add('2026-09-12',{t:'12:20 - 18:00',lbl:'Cyclisme - La Vuelta · Etape 20 La Calahorra > Collado Del Alguacil',sport:'Cycling',plat:['auvio']});
+add('2026-09-12',{t:'08:38 - 10:50',lbl:'MotoGP - Grand Prix Saint-Marin · Essais libres 2',sport:'Motogp',plat:['auvio']});
+add('2026-09-12',{t:'10:48 - 11:45',lbl:'MotoGP - Grand Prix Saint-Marin · Les Qualifications',sport:'Motogp',plat:['auvio']});
 add('2026-09-12',{t:'16:50 - 19:30',lbl:'Red Dragons - Finland',sport:'Volleyball',plat:['vrt']});
 add('2026-09-13',{t:'19:50 - 22:00',lbl:'Finale WK basketbal vrouwen',sport:'Basketball',plat:['vrt']});
 add('2026-09-27',{t:'11:00 - 21:00',lbl:'Finale',sport:'Tennis',plat:['vrt']});
