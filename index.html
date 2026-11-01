@@ -206,7 +206,6 @@ addRange('2026-12-10','2026-12-31',{t:'1:30pm & 8pm',lbl:'PDC World Darts Champi
 // --- Hockey World Cup — Belgium group matches (Wavre) ---
 
 // --- F1 (Belgian time) ---
-add('2026-10-31',{t:'~22:00',lbl:'F1 · Mexico City GP — Qualifying (TBC)',sport:'F1',plat:['auvio','vrt']});
 add('2026-11-07',{t:'~19:00',lbl:'F1 · São Paulo GP — Qualifying (TBC)',sport:'F1',plat:['auvio','vrt']});
 add('2026-11-21',{t:'~05:00',lbl:'F1 · Las Vegas GP — Qualifying (night, TBC)',sport:'F1',plat:['auvio','vrt']});
 add('2026-11-28',{t:'~18:00',lbl:'F1 · Qatar GP — Qualifying (TBC)',sport:'F1',plat:['auvio','vrt']});
@@ -247,25 +246,25 @@ add('2026-12-27',{t:'~3pm',lbl:'Cyclocross · World Cup Namur',sport:'Cyclocross
 add('2026-12-29',{t:'~3pm',lbl:'Cyclocross · World Cup Besançon',sport:'Cyclocross',plat:['vrt']});
 
 // --- AUTO-DETECTED (daily bot — do not hand-edit below this line) ---
-add('2026-10-31',{t:'17:00 - 22:25',lbl:'WK G-baanwielrennen',sport:'Baanwielrennen',plat:['vrt']});
-add('2026-10-31',{t:'20:30 - 22:30',lbl:'RSCA Futsal - Kairat',sport:'Football',plat:['vrt']});
-add('2026-10-31',{t:'19:30 - 21:05',lbl:'Youth Olympic Games 2026',sport:'Programma',plat:['vrt']});
 add('2026-11-01',{t:'13:00 - 17:00',lbl:'WK G-baanwielrennen',sport:'Baanwielrennen',plat:['vrt']});
+add('2026-11-01',{t:'Live now',lbl:'WK G-baanwielrennen',sport:'Baanwielrennen',plat:['vrt']});
 add('2026-11-01',{t:'13:30 - 14:45',lbl:'Koppenbergcross',sport:'Cyclocross',plat:['vrt']});
 add('2026-11-01',{t:'14:45 - 16:25',lbl:'Koppenbergcross',sport:'Cyclocross',plat:['vrt']});
 add('2026-11-05',{t:'18:25 - 20:40',lbl:'Anderlecht - Red Bull Salzburg',sport:'Football',plat:['vrt']});
 add('2026-11-05',{t:'20:35 - 23:05',lbl:'Union - Celta de Vigo',sport:'Football',plat:['vrt']});
+add('2026-11-06',{t:'17:00 - 18:50',lbl:'Flanders Open',sport:'Swimming',plat:['vrt']});
 add('2026-11-07',{t:'14:50 - 16:15',lbl:'EK veldrijden in Zeddam',sport:'Cyclocross',plat:['vrt']});
 add('2026-11-07',{t:'20:00 - 21:50',lbl:'België - Italië',sport:'Handball',plat:['vrt']});
+add('2026-11-07',{t:'17:00 - 18:50',lbl:'Flanders Open',sport:'Swimming',plat:['vrt']});
 // --- end auto-detected ---
 
 // ---- Render ----
 const MONTHS=[
-  {name:'October 2026',y:2026,m:9},
   {name:'November 2026',y:2026,m:10},
   {name:'December 2026',y:2026,m:11},
   {name:'January 2027',y:2027,m:0},
   {name:'February 2027',y:2027,m:1},
+  {name:'March 2027',y:2027,m:2},
 ];
 const DOW=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const root=document.getElementById('cal');
